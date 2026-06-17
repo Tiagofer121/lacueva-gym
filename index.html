@@ -1,81 +1,988 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Liga Chuy</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Cueva Gym — Demo Propuesta Web</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black:    #0A0A0A;
+    --cave:     #141414;
+    --dark:     #1E1E1E;
+    --mid:      #2C2C2C;
+    --light:    #F0EDE8;
+    --muted:    #888;
+    --red:      #C0392B;
+    --red-glow: rgba(192,57,43,0.25);
+    --gold:     #C9A84C;
+    --white:    #FFFFFF;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--black);
+    color: var(--light);
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 40px;
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: padding .3s;
+  }
+  nav.scrolled { padding: 12px 40px; }
+
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: .12em;
+    color: var(--light);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--red); }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--light); }
+
+  .nav-cta {
+    background: var(--red);
+    color: var(--white) !important;
+    padding: 9px 20px;
+    border-radius: 4px;
+    transition: background .2s !important;
+  }
+  .nav-cta:hover { background: #a93226 !important; color: var(--white) !important; }
+
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 4px;
+  }
+  .hamburger span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--light);
+    transition: .3s;
+  }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    position: relative;
+    overflow: hidden;
+    padding: 0 40px 80px;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.7) 60%, rgba(10,10,10,1) 100%),
+      url('https://instagram.fmvd3-1.fna.fbcdn.net/v/t51.82787-15/649427266_17973522344848600_1327957402233428287_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=104&ig_cache_key=Mjk1NDA1MjEyNjQ2MTQ4MjQyOA%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTQ0MC5zZHIucmVndWxhcl9waG90by5DMiJ9&_nc_ohc=9JIKavQ5Hb8Q7kNvwGZpaq-&_nc_oc=Ado6SlVOx4ylpA5j9dGPBoNI_e5lWdSXr3gJd4nUV03DIphwogW4G0Stq_cDAUD9LsZfcomEDDYswqlINCj5PKhO&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=instagram.fmvd3-1.fna&_nc_gid=guXym1w8OeHTVVU15gOHRQ&_nc_ss=7a22e&oh=00_Af8fmgaEbtmLmVHqklDR5ud4xZOz3eYheQ8t9pzIMsO0ng&oe=6A390270') center/cover no-repeat;
+    transform: scale(1.03);
+    transition: transform 8s ease-out;
+  }
+  .hero-bg.loaded { transform: scale(1); }
+
+  /* Diagonal red accent */
+  .hero-accent {
+    position: absolute;
+    top: 0; right: 0;
+    width: 6px;
+    height: 100%;
+    background: var(--red);
+  }
+
+  .hero-eyebrow {
+    position: relative;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 2px;
+    background: var(--gold);
+  }
+
+  .hero-title {
+    position: relative;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 14vw, 12rem);
+    line-height: .9;
+    letter-spacing: .04em;
+    color: var(--light);
+    margin-bottom: 28px;
+  }
+  .hero-title .highlight { color: var(--red); }
+
+  .hero-sub {
+    position: relative;
+    max-width: 480px;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.7;
+    color: rgba(240,237,232,0.72);
+    margin-bottom: 40px;
+  }
+
+  .hero-badge {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(201,168,76,0.12);
+    border: 1px solid rgba(201,168,76,0.4);
+    border-radius: 4px;
+    padding: 10px 18px;
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 36px;
+    width: fit-content;
+  }
+  .hero-badge::before { content: '🏆'; font-size: 1rem; }
+
+  .hero-actions {
+    position: relative;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--red);
+    color: var(--white);
+    padding: 15px 30px;
+    border-radius: 4px;
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background .2s, transform .15s;
+    border: none;
+    cursor: pointer;
+  }
+  .btn-primary:hover { background: #a93226; transform: translateY(-2px); }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    color: var(--light);
+    padding: 15px 30px;
+    border-radius: 4px;
+    border: 1px solid rgba(240,237,232,0.3);
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: border-color .2s, color .2s;
+    cursor: pointer;
+  }
+  .btn-ghost:hover { border-color: var(--light); }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    background: var(--dark);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 28px 40px;
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    flex-wrap: wrap;
+  }
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.4rem;
+    color: var(--red);
+    line-height: 1;
+    display: block;
+  }
+  .stat-label {
+    font-size: .68rem;
+    font-weight: 600;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-top: 4px;
+  }
+
+  /* ── SECTION COMMONS ── */
+  section { padding: 100px 40px; }
+
+  .section-eyebrow {
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    color: var(--red);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .section-eyebrow::after {
+    content: '';
+    flex: 1;
+    max-width: 48px;
+    height: 2px;
+    background: var(--red);
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.6rem, 5vw, 4.5rem);
+    line-height: 1;
+    letter-spacing: .04em;
+    margin-bottom: 20px;
+  }
+
+  /* ── SOBRE NOSOTROS ── */
+  #sobre {
+    background: var(--cave);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    padding: 100px 40px;
+  }
+
+  .sobre-visual {
+    position: relative;
+  }
+
+  .sobre-img-main {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    border-radius: 6px;
+    display: block;
+    background: url('https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=800&q=80') center/cover;
+  }
+
+  .sobre-img-overlay {
+    position: absolute;
+    bottom: -24px;
+    right: -24px;
+    width: 55%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 6px;
+    background: url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80') center/cover;
+    border: 4px solid var(--cave);
+  }
+
+  .sobre-tag {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    background: var(--red);
+    color: var(--white);
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    padding: 8px 14px;
+    border-radius: 3px;
+  }
+
+  .sobre-body p {
+    font-size: .95rem;
+    line-height: 1.8;
+    color: rgba(240,237,232,0.72);
+    margin-bottom: 20px;
+  }
+
+  .sobre-pill-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 32px;
+  }
+  .pill {
+    background: var(--mid);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 100px;
+    padding: 7px 16px;
+    font-size: .73rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .pill.active {
+    background: var(--red-glow);
+    border-color: var(--red);
+    color: var(--light);
+  }
+
+  /* ── GALERÍA ── */
+  #galeria {
+    background: var(--black);
+    padding: 100px 40px;
+  }
+
+  .galeria-header {
+    max-width: 600px;
+    margin-bottom: 60px;
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: auto;
+    gap: 12px;
+  }
+
+  .g-item {
+    overflow: hidden;
+    border-radius: 6px;
+    position: relative;
+    cursor: pointer;
+  }
+  .g-item::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.3);
+    transition: background .3s;
+  }
+  .g-item:hover::after { background: rgba(192,57,43,0.3); }
+
+  .g-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .5s ease;
+  }
+  .g-item:hover img { transform: scale(1.05); }
+
+  .g1 { grid-column: 1 / 6; grid-row: 1; height: 380px; }
+  .g2 { grid-column: 6 / 9; grid-row: 1; height: 380px; }
+  .g3 { grid-column: 9 / 13; grid-row: 1; height: 380px; }
+  .g4 { grid-column: 1 / 5; grid-row: 2; height: 260px; }
+  .g5 { grid-column: 5 / 9; grid-row: 2; height: 260px; }
+  .g6 { grid-column: 9 / 13; grid-row: 2; height: 260px; }
+
+  /* ── BENEFICIOS ── */
+  #beneficios {
+    background: var(--cave);
+    padding: 100px 40px;
+  }
+
+  .beneficios-header {
+    text-align: center;
+    max-width: 580px;
+    margin: 0 auto 70px;
+  }
+  .beneficios-header .section-eyebrow {
+    justify-content: center;
+  }
+  .beneficios-header .section-eyebrow::after { display: none; }
+  .beneficios-header .section-eyebrow::before {
+    content: '';
+    flex: 1;
+    max-width: 48px;
+    height: 2px;
+    background: var(--red);
+  }
+
+  .beneficios-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+    max-width: 960px;
+    margin: 0 auto;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .benefit-card {
+    background: var(--dark);
+    padding: 48px 44px;
+    position: relative;
+    overflow: hidden;
+    transition: background .25s;
+  }
+  .benefit-card:hover { background: #252525; }
+
+  .benefit-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 0;
+    background: var(--red);
+    transition: height .35s ease;
+  }
+  .benefit-card:hover::before { height: 100%; }
+
+  .benefit-icon {
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  .benefit-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.7rem;
+    letter-spacing: .05em;
+    color: var(--light);
+    margin-bottom: 12px;
+  }
+
+  .benefit-desc {
+    font-size: .88rem;
+    line-height: 1.75;
+    color: rgba(240,237,232,0.6);
+  }
+
+  .benefit-num {
+    position: absolute;
+    bottom: 20px;
+    right: 28px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 4.5rem;
+    color: rgba(255,255,255,0.04);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  /* ── CTA BAND ── */
+  .cta-band {
+    background:
+      linear-gradient(135deg, rgba(10,10,10,0.92) 0%, rgba(20,20,20,0.88) 100%),
+      url('https://lh3.googleusercontent.com/sitesv/AA5AbUBjPwxKj2ellmcV5QKSQr1bxOVZbjKgayciRHs3-Jub4lqmvLLC2lm2jGsmzgE0efvPNDYHSokbb0aF3cmDTmpoycWvwS_apcl5JG_lT_RODzggN-mkeu49RKc6eWQnxnCtlZpVLpbPEU5QJw82-0qvGenHyApea4Dcp-fbTZjUpVSFlH1gOPSdc0P1kG4=w16383') center/cover no-repeat;
+    padding: 90px 40px;
+    text-align: center;
+  }
+  .cta-band .section-title { margin-bottom: 16px; }
+  .cta-band p {
+    font-size: .95rem;
+    color: rgba(240,237,232,0.65);
+    max-width: 460px;
+    margin: 0 auto 36px;
+    line-height: 1.7;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--cave);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 64px 40px 32px;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 48px;
+    margin-bottom: 56px;
+  }
+
+  .footer-brand .nav-logo {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 16px;
+  }
+  .footer-brand p {
+    font-size: .85rem;
+    line-height: 1.75;
+    color: var(--muted);
+    max-width: 300px;
+    margin-bottom: 28px;
+  }
+
+  .social-row {
+    display: flex;
+    gap: 12px;
+  }
+  .social-link {
+    width: 38px;
+    height: 38px;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: .9rem;
+    transition: border-color .2s, color .2s, background .2s;
+  }
+  .social-link:hover {
+    border-color: var(--red);
+    color: var(--red);
+    background: var(--red-glow);
+  }
+
+  .footer-col h4 {
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--light);
+    margin-bottom: 20px;
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col li {
+    font-size: .84rem;
+    color: var(--muted);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.5;
+  }
+  .footer-col li span { flex-shrink: 0; }
+
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .footer-bottom p {
+    font-size: .75rem;
+    color: rgba(136,136,136,0.6);
+  }
+
+  .demo-badge {
+    background: rgba(192,57,43,0.15);
+    border: 1px solid rgba(192,57,43,0.4);
+    border-radius: 4px;
+    padding: 5px 12px;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--red);
+  }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .65s ease, transform .65s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── MOBILE NAV ── */
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(10,10,10,0.97);
+    z-index: 99;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.4rem;
+    letter-spacing: .1em;
+    color: var(--light);
+    text-decoration: none;
+    transition: color .2s;
+  }
+  .mobile-menu a:hover { color: var(--red); }
+  .close-menu {
+    position: absolute;
+    top: 20px; right: 28px;
+    background: none;
+    border: none;
+    color: var(--light);
+    font-size: 1.8rem;
+    cursor: pointer;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+
+    #hero { padding: 0 24px 60px; }
+    .hero-accent { display: none; }
+
+    .stats-bar { gap: 36px; padding: 24px; }
+
+    #sobre {
+      grid-template-columns: 1fr;
+      gap: 48px;
+      padding: 72px 24px;
+    }
+    .sobre-img-overlay { display: none; }
+    .sobre-img-main { aspect-ratio: 4/3; }
+
+    section { padding: 72px 24px; }
+    #galeria, #beneficios { padding: 72px 24px; }
+
+    .gallery-grid {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto;
+    }
+    .g1, .g2, .g3, .g4, .g5, .g6 {
+      grid-column: auto;
+      grid-row: auto;
+      height: 200px;
+    }
+    .g1 { grid-column: 1 / 3; height: 240px; }
+
+    .beneficios-grid { grid-template-columns: 1fr; }
+    .benefit-card { padding: 36px 28px; }
+
+    .footer-grid { grid-template-columns: 1fr; gap: 40px; }
+
+    .footer-bottom { flex-direction: column; text-align: center; }
+
+    .cta-band { padding: 72px 24px; }
+  }
+
+  @media (max-width: 480px) {
+    .hero-actions { flex-direction: column; }
+    .btn-primary, .btn-ghost { justify-content: center; }
+    .stats-bar { gap: 20px; }
+    .stat-num { font-size: 2rem; }
+  }
+</style>
 </head>
 <body>
 
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="close-menu" onclick="toggleMenu()">✕</button>
+  <a href="#sobre" onclick="toggleMenu()">Nosotros</a>
+  <a href="#galeria" onclick="toggleMenu()">Galería</a>
+  <a href="#beneficios" onclick="toggleMenu()">Beneficios</a>
+  <a href="#contacto" onclick="toggleMenu()" style="color:var(--red)">Contacto</a>
+</div>
 
+<!-- NAV -->
+<nav id="navbar">
+  <a class="nav-logo" href="#hero">LA <span>CUEVA</span> GYM</a>
+  <ul class="nav-links">
+    <li><a href="#sobre">Nosotros</a></li>
+    <li><a href="#galeria">Galería</a></li>
+    <li><a href="#beneficios">Beneficios</a></li>
+    <li><a href="#contacto" class="nav-cta">Contacto</a></li>
+  </ul>
+  <button class="hamburger" onclick="toggleMenu()" aria-label="Menú">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
 
-    <section class="menu-arriba">
-        <header class="header">
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-accent"></div>
 
-        </header>
-    </section>
+  <div class="hero-eyebrow reveal">Departamento de Rocha, Uruguay</div>
 
-    <section class="inicio">
-        <div class="informacion-detalles">
-            <div class="izquierda">
-                <div class="fecha-div"><p class="fecha">Fecha 1</p></div>
-                <div class="nombres-clubs">
-                    <p class="nombre-clubs-p">san vicente</p>
-                    <p class="vs">VS</p>
-                    <p class="nombre-clubs-p">internacional</p>
-                </div>
-                <div class="datos-partido">
-                    <p class="dia-partido">domingo 19 de mayo, 2026</p>
-                    <p class="hora-partido">15:30 hs</p>
-                    <p class="ubicacion-partido">local internacional</p>
-                </div>
-                <a href="" class="ver-detalles">ver detalles</a>
-            </div>
-            <div class="derecha">
-                <div class="equipos-imagen-vs">
-                    <img src="internacional.png" alt="" class="logo-equipo-img">
-                    <p class="vs">VS</p>
-                    <img src="san-vicente.png" alt="" class="logo-equipo-img">
-                </div>
-                <div class="falta-para-partido">
-                    <p class="falta-para-partido-p">falta para el partido</p>
-                    <div class="cronometro">00 | 00 | 00</div>
-                </div>
-            </div>
-        </div>
-    </section>
+  <h1 class="hero-title reveal">
+    LA<br><span class="highlight">CUEVA</span><br>GYM
+  </h1>
 
-    <div class="informacion">
-        <div class="infromacion-cards">
-            <div class="ultimos-resultados">
-                <p class="ultimos-resultados-p">ultimos resultados</p>
-                <a href="" class="ver-mas">ver todos</a>
-            </div>
-            <div class="partido">
-                <div class="equipo"><img src="pdd.png" alt=""><p class="nombre-club">punta del diablo</p></div>
-                <p class="resultado">-</p>
-                <div class="equipo"><p class="nombre-club">nacional</p><img src="https://cndef.nyc3.cdn.digitaloceanspaces.com/files/page-file/Escudo%20Nacional.png" alt=""></div>
-            </div>
-            <div class="partido">
-                <div class="equipo"><img src="pdd.png" alt=""><p class="nombre-club">central palestino</p></div>
-                <p class="resultado">-</p>
-                <div class="equipo"><p class="nombre-club">manya</p><img src="https://cndef.nyc3.cdn.digitaloceanspaces.com/files/page-file/Escudo%20Nacional.png" alt=""></div>
-            </div>
-        </div>
-        <div class="infromacion-cards">
-            <div class="tabla">
-                <p class="tabla-p">tabla</p>
-                <a href="" class="ver-mas">ver completa</a>
-            </div>
-        </div>
-        <div class="infromacion-cards">
-            <div class="goleadores">
-                <p class="tabla-p">goleadores</p>
-                <a href="" class="ver-mas">ver todos</a>
-            </div>
-        </div>
+  <p class="hero-sub reveal">
+    El único lugar donde el hierro no miente. Entrenamiento de fuerza, powerlifting y superación personal en un ambiente serio y apasionado.
+  </p>
+
+  <div class="hero-badge reveal">
+    Primer Gimnasio Federado de Powerlifting en Rocha
+  </div>
+
+  <div class="hero-actions reveal">
+    <a href="https://wa.me/59800000000" class="btn-primary" target="_blank">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Contactar por WhatsApp
+    </a>
+    <a href="#sobre" class="btn-ghost">Conocer más</a>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat-item reveal">
+    <span class="stat-num">1°</span>
+    <span class="stat-label">Gym federado en Rocha</span>
+  </div>
+  <div class="stat-item reveal">
+    <span class="stat-num">+100</span>
+    <span class="stat-label">Atletas activos</span>
+  </div>
+  <div class="stat-item reveal">
+    <span class="stat-num">6</span>
+    <span class="stat-label">Rutinas disponibles</span>
+  </div>
+  <div class="stat-item reveal">
+    <span class="stat-num">∞</span>
+    <span class="stat-label">Fuerza por construir</span>
+  </div>
+</div>
+
+<!-- SOBRE NOSOTROS -->
+<section id="sobre">
+  <div class="sobre-visual reveal">
+    <div class="sobre-img-main"></div>
+    <div class="sobre-img-overlay"></div>
+    <span class="sobre-tag">Powerlifting · Fuerza · Comunidad</span>
+  </div>
+
+  <div class="sobre-body">
+    <div class="section-eyebrow reveal">Sobre Nosotros</div>
+    <h2 class="section-title reveal">Donde la fuerza<br>toma forma</h2>
+
+    <p class="reveal">
+      La Cueva Gym nació con una misión clara: llevar el entrenamiento de fuerza serio al departamento de Rocha. No somos un gimnasio más. Somos el primer espacio federado para Powerlifting en la región.
+    </p>
+    <p class="reveal">
+      Acá conviven principiantes que dan sus primeros pasos con el hierro y atletas que compiten a nivel nacional. Lo que nos une es el respeto por el proceso, la constancia y la pasión por mejorar cada día.
+    </p>
+
+    <div class="sobre-pill-list reveal">
+      <span class="pill active">Powerlifting</span>
+      <span class="pill active">Entrenamiento de Fuerza</span>
+      <span class="pill">Musculación</span>
+      <span class="pill">Acondicionamiento Físico</span>
+      <span class="pill active">Federado Oficialmente</span>
+    </div>
+  </div>
+</section>
+
+<!-- GALERÍA -->
+<section id="galeria">
+  <div class="galeria-header">
+    <div class="section-eyebrow reveal">Galería</div>
+    <h2 class="section-title reveal">El ambiente<br>que nos define</h2>
+    <p class="reveal" style="font-size:.9rem;color:rgba(240,237,232,0.6);line-height:1.7;">Cada rincón de La Cueva está diseñado para un solo propósito: que entrenes mejor.</p>
+  </div>
+
+  <div class="gallery-grid">
+    <div class="g-item g1 reveal">
+      <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=900&q=80" alt="Sala de pesas" loading="lazy">
+    </div>
+    <div class="g-item g2 reveal">
+      <img src="https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=600&q=80" alt="Powerlifting" loading="lazy">
+    </div>
+    <div class="g-item g3 reveal">
+      <img src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=700&q=80" alt="Equipamiento" loading="lazy">
+    </div>
+    <div class="g-item g4 reveal">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTegX6Xpz6OhfPPnp2s_sTadk5eGCzS74zMTGZHw0iUyg&s=10" alt="Barra" loading="lazy">
+    </div>
+    <div class="g-item g5 reveal">
+      <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=700&q=80" alt="Entrenamiento" loading="lazy">
+    </div>
+    <div class="g-item g6 reveal">
+      <img src="https://images.unsplash.com/photo-1550259979-ed79b48d2a30?w=700&q=80" alt="Comunidad" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<!-- BENEFICIOS -->
+<section id="beneficios">
+  <div class="beneficios-header">
+    <div class="section-eyebrow reveal">Por qué elegirnos</div>
+    <h2 class="section-title reveal">Todo lo que necesitás<br>para crecer</h2>
+  </div>
+
+  <div class="beneficios-grid">
+    <div class="benefit-card reveal">
+      <span class="benefit-icon">🏋️</span>
+      <h3 class="benefit-title">Equipamiento</h3>
+      <p class="benefit-desc">Barras olímpicas, discos de calibre, racks de sentadilla y todo lo que necesitás para entrenar en serio. Equipos en perfecto estado y adecuados para competencia.</p>
+      <span class="benefit-num">01</span>
     </div>
 
+    <div class="benefit-card reveal">
+      <span class="benefit-icon">🔥</span>
+      <h3 class="benefit-title">Ambiente</h3>
+      <p class="benefit-desc">Sin distracciones. Sin shows. La Cueva tiene la energía de quienes van a trabajar de verdad. Un espacio para concentrarte y rendir al máximo.</p>
+      <span class="benefit-num">02</span>
+    </div>
+
+    <div class="benefit-card reveal">
+      <span class="benefit-icon">📈</span>
+      <h3 class="benefit-title">Entrenamiento</h3>
+      <p class="benefit-desc">Rutinas estructuradas de 3 a 6 días para todos los niveles. Programación orientada al progreso real, tanto para salud general como para competencia.</p>
+      <span class="benefit-num">03</span>
+    </div>
+
+    <div class="benefit-card reveal">
+      <span class="benefit-icon">🤝</span>
+      <h3 class="benefit-title">Comunidad</h3>
+      <p class="benefit-desc">Desde el día uno sos parte de algo. Una comunidad que celebra cada PR, que te acompaña en los días difíciles y que entiende lo que es vivir para el hierro.</p>
+      <span class="benefit-num">04</span>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<div class="cta-band" id="contacto">
+  <div class="section-eyebrow reveal" style="justify-content:center;"><span style="width:48px;height:2px;background:var(--red);display:inline-block;"></span>&nbsp; ¿Listo? &nbsp;<span style="width:48px;height:2px;background:var(--red);display:inline-block;"></span></div>
+  <h2 class="section-title reveal">Empezá hoy<br>en La Cueva</h2>
+  <p class="reveal">Escribinos y te contamos todo lo que necesitás saber para comenzar tu primer día de entrenamiento.</p>
+  <a href="https://wa.me/59800000000" class="btn-primary reveal" target="_blank" style="display:inline-flex;">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    Escribir por WhatsApp
+  </a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand reveal">
+      <a class="nav-logo" href="#hero">LA <span style="color:var(--red)">CUEVA</span> GYM</a>
+      <p>El primer gimnasio federado para Powerlifting en el departamento de Rocha, Uruguay. Fuerza, comunidad y superación personal.</p>
+      <div class="social-row">
+        <a href="#" class="social-link" aria-label="Facebook">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </a>
+        <a href="#" class="social-link" aria-label="Instagram">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        </a>
+        <a href="#" class="social-link" aria-label="TikTok">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="footer-col reveal">
+      <h4>Contacto</h4>
+      <ul>
+        <li><span>📍</span> Rocha, Uruguay</li>
+        <li><span>📱</span> +598 00 000 000 <em style="font-size:.72rem;color:rgba(136,136,136,0.6)">(demo)</em></li>
+        <li><span>✉️</span> info@lacuevagym.uy <em style="font-size:.72rem;color:rgba(136,136,136,0.6)">(demo)</em></li>
+      </ul>
+    </div>
+
+    <div class="footer-col reveal">
+      <h4>Horario</h4>
+      <ul>
+        <li><span>📅</span> Lun–Vie: a confirmar</li>
+        <li><span>📅</span> Sáb: a confirmar</li>
+        <li><span>📅</span> Dom: a confirmar</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2025 La Cueva Gym · Rocha, Uruguay · Todos los derechos reservados</p>
+    <span class="demo-badge">⚠ Demo Comercial — No publicar</span>
+  </div>
+</footer>
+
+<script>
+  // Nav scroll effect
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Hero bg subtle entrance
+  window.addEventListener('load', () => {
+    document.getElementById('heroBg').classList.add('loaded');
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 60);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Mobile menu
+  function toggleMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+    document.body.style.overflow = document.getElementById('mobileMenu').classList.contains('open') ? 'hidden' : '';
+  }
+
+  // Smooth anchor scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const id = a.getAttribute('href');
+      if (id === '#') return;
+      const el = document.querySelector(id);
+      if (el) {
+        e.preventDefault();
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  // Reduced motion
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+  }
+</script>
 </body>
 </html>
